@@ -16,5 +16,9 @@ router.get('/users', async function (req, res) {
     res.send(data);
 
 });
-
+router.delete('/delAdminUser', async function (req, res, next) {//删除数据
+    let id = req.query.id; 
+    await client.delete("/users/" + id);
+    res.send("suc")
+});
 module.exports = router;
