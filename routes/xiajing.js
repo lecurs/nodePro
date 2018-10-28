@@ -16,6 +16,13 @@ router.get('/users', async function (req, res) {
     res.send(data);
 
 });
+router.post('/addAdminUser', async function (req, res) {//增加
+    let params = req.body; 
+    console.log(params);    
+    await client.post("/users/", params);
+    res.send("suc");
+
+});
 router.delete('/delAdminUser', async function (req, res, next) {//删除数据
     let id = req.query.id; 
     await client.delete("/users/" + id);
