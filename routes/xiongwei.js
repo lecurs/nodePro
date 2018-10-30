@@ -2,15 +2,15 @@ var express = require('express');
 var router = express.Router();
 const client = require("ykt-http-client");
 client.url("localhost:8080");
-const _ =require("lodash");
+const _ = require("lodash");
 
 // 渲染店铺列表
 router.get('/', async function (req, res) {
     let { ownerId } = req.query;
     // let data = await client.get('/stores', { ownerId, submitType: 'findJoin', ref: ['orders', 'users'] });
     let data = await client.get('/stores');
-    data=_.filter(data,function(item){
-        return item.owner==ownerId
+    data = _.filter(data, function (item) {
+        return item.owner == ownerId
     })
     res.send(data);
 });
@@ -19,8 +19,8 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
     let id = req.params.id;
     let data = await client.get('/stores');
-    data=_.filter(data,function(item){
-        return item._id==id
+    data = _.filter(data, function (item) {
+        return item._id == id
     })
     res.send(data);
 });
@@ -28,46 +28,83 @@ router.get('/:id', async function (req, res) {
 // 获取门店商品
 router.get('/goodsOfStore/:id', async function (req, res) {
     let id = req.params.id;
-    let data = await client.get('/goods',{submitType: 'findJoin', ref: ['stores','owners']});
-    data=_.filter(data,function(item){
-        return item.stores._id==id
-    })
-    res.send(data);
+    let data = await client.get('/stores/' + id);
+    res.send(data.goods);
 });
 
 // 获取门店服务
 router.get('/servicesOfStore/:id', async function (req, res) {
     let id = req.params.id;
-    let data = await client.get('/services',{submitType: 'findJoin', ref: 'stores'});
-    data=_.filter(data,function(item){
-        return item.stores._id==id
-    })
-    res.send(data);
+    let data = await client.get('/stores/' + id);
+    res.send(data.services);
 });
 
 // 获取店主商品
 router.get('/getMyGoods/:id', async function (req, res) {
     let id = req.params.id;
-    let data = await client.get('/goods',{submitType: 'findJoin', ref: ['stores','owners']});
-    data=_.filter(data,function(item){
-        return item.owners._id==id
-    })
+    let data = await client.get('/goods', { submitType: 'findJoin', ref: 'owners' });
+    data = _.filter(data, function (item) {
+        return item.owners._id == id
+    });
+    res.send(data);
+});
+
+// 获取店主服务
+router.get('/getMyServices/:id', async function (req, res) {
+    let id = req.params.id;
+    let data = await client.get('/services', { submitType: 'findJoin', ref: 'owners' });
+    data = _.filter(data, function (item) {
+        return item.owners._id == id
+    });
     res.send(data);
 });
 
 // 添加门店商品
-router.get('/goodsOfStores/:id', async function (req, res) {
-    let id = req.params.id;
-    let {storeId}=req.query;
-    console.log(storeId);
-    let data = await client.get('/goods/'+id);
-    let ary=_.filter(data.stores,function(item){
-        return item.$id==storeId;
+router.put('/addGoods/:id', async function (req, res) {
+    let storeId = req.params.id;
+    let { id } = req.body;
+    let dataGood = await client.get('/goods/' + id);
+    let dataStore = await client.get('/stores/' + storeId);
+    let haveGood = _.filter(dataStore.goods, function (e) {
+        return e.name == dataGood.name;
     });
-    console.log(ary)
-    if(ary.length==0){
-        data.stores.push({$ref:'stores',$id:`Objected("${storeId}")`})
-        await client.put('/goods/'+id,{stores:data.stores});
+    if (haveGood.length == 0) {
+        let obj = {
+            name: dataGood.name,
+            type: dataGood.type,
+            weight: dataGood.weight,
+            area: dataGood.area,
+            productDate: dataGood.productDate,
+            longLife: dataGood.longLife,
+            price: dataGood.price,
+            amount: dataGood.amount
+        }
+        dataStore.goods.push(obj);
+        await client.put('/stores/' + storeId, {goods:dataStore.goods});
+    }
+    res.send('suc');
+});
+
+// 添加门店服务
+router.put('/addServices/:id', async function (req, res) {
+    let storeId = req.params.id;
+    let { id } = req.body;
+    let dataService = await client.get('/services/' + id);
+    let dataStore = await client.get('/stores/' + storeId);
+    let haveService = _.filter(dataStore.services, function (e) {
+        return e.name == dataService.name;
+    });
+    if (haveService.length == 0) {
+        let obj = {
+            name: dataService.name,
+            workTime: dataService.workTime,
+            timeLong: dataService.timeLong,
+            staffLevel: dataService.staffLevel,
+            basePrice: dataService.basePrice,
+            weight: dataService.weight
+        }
+        dataStore.services.push(obj);
+        await client.put('/stores/' + storeId, {services:dataStore.services});
     }
     res.send('suc');
 });
