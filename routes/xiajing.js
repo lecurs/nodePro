@@ -226,7 +226,18 @@ router.get('/getPetMaster', async function (req, res) {
         rows,
     });
     res.send(data);
+});
 
+//获取所有供应商
 
+router.get('/getAllSupplier', async function (req, res) {
+    let params = req.query;
+    let page = params.page || 1;
+    let rows = params.rows || 5;
+    let data = await client.get("/suppliers", {
+        page,
+        rows,
+    });
+    res.send(data);
 });
 module.exports = router;
