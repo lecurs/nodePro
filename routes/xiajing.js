@@ -49,21 +49,56 @@ router.get('/usersAccount', async function (req, res) {
     let params = req.query;
     let privilege = params.privilege;
     let page = params.page || 1;
-    let rows = params.rows || 10;
+    let rows = params.rows || 5;
     let user = params.user;
     let passed = params.passed;
-    let data = await client.get("/users", {
-        page,
-        rows,
-        privilege,
-        user,
-        passed
-    });
-    res.send(data);
-
+    if (passed) {
+        let data = await client.get("/users", {
+            page,
+            rows,
+            privilege,
+            user,
+            passed,
+            // findType: "exact"
+        });
+        res.send(data);
+    } else {
+        let data = await client.get("/users", {
+            page,
+            rows,
+            privilege,
+            user,
+        });
+        res.send(data);
+    }
 
 });
 
+router.get('/usersAccountByType', async function (req, res) {
+    let params = req.query;
+    let privilege = params.privilege;
+    let page = params.page || 1;
+    let rows = params.rows || 5;
+    let passed = params.passed;
+    if (passed) {
+        let data = await client.get("/users", {
+            page,
+            rows,
+            privilege,
+            passed,
+            findType: "exact"
+        });
+        res.send(data);
+    } else {
+        let data = await client.get("/users", {
+            page,
+            rows,
+            privilege,
+        });
+        res.send(data);
+    }
+
+});
 router.put('/updateUser/:id', async function (req, res) { //修改用户数据
     let id = req.params.id;
     await client.put("/users/" + id, {
@@ -150,44 +185,48 @@ router.put('/updateStorePassed/:id', async function (req, res) { //更改店铺�
     let id = req.params.id;
     let passed = req.body.passed;
     let newMsg = req.body.newMsg;
-    console.log('====================================');
-    console.log(newMsg);
-    console.log('====================================');
     let data = await client.get("/stores/" + id);
     if (newMsg) {
-        data.name=newMsg.name
-        data.licenseCode=newMsg.licenseCode
-        data.licenseImg=newMsg.licenseImg 
-        data.adress=newMsg.adress 
-        data.location=newMsg.location 
-        data.legalPerson =newMsg.legalPerson
-        data.phone=newMsg.phone
-        data.shopImg =newMsg.shopImg
-        data.special=newMsg.special
-        data.vip=newMsg.vip
-        data.rate=newMsg.rate
+        data.name = newMsg.name
+        data.licenseCode = newMsg.licenseCode
+        data.licenseImg = newMsg.licenseImg
+        data.adress = newMsg.adress
+        data.location = newMsg.location
+        data.legalPerson = newMsg.legalPerson
+        data.phone = newMsg.phone
+        data.shopImg = newMsg.shopImg
+        data.special = newMsg.special
+        data.vip = newMsg.vip
+        data.rate = newMsg.rate
     }
-    console.log('================更改后店铺的信息====================');
-    console.log(data);
-    console.log('====================================');
-   let result= await client.put("/stores/" + id, {
-        "name":data.name,
-        "licenseCod":data.licenseCod,
-        "licenseImg":data.licenseImg,
-        "adress":data.adress,
-        "location":data.location,
-        "legalPerson":data.legalPerson,
-        "phone":data.phone,
-        "shopImg":data.shopImg,
-        "special":data.special,
-        "vip":data.vip,
-        "rate":data.rate
-   });
-    console.log('====================================');
-    console.log(result);
-    console.log('====================================');
+
+    let result = await client.put("/stores/" + id, {
+        "name": data.name,
+        "licenseCod": data.licenseCod,
+        "licenseImg": data.licenseImg,
+        "adress": data.adress,
+        "location": data.location,
+        "legalPerson": data.legalPerson,
+        "phone": data.phone,
+        "shopImg": data.shopImg,
+        "special": data.special,
+        "vip": data.vip,
+        "rate": data.rate
+    });
+
     res.send(result);
 });
+//获取宠主数据
+router.get('/getPetMaster', async function (req, res) {
+    let params = req.query;
+    let page = params.page || 1;
+    let rows = params.rows || 5;
+    let data = await client.get("/petmasters", {
+        page,
+        rows,
+    });
+    res.send(data);
 
 
+});
 module.exports = router;
