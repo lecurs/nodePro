@@ -7,7 +7,6 @@ const _ = require("lodash");
 // 渲染店铺列表
 router.get('/', async function (req, res) {
     let { ownerId } = req.query;
-    // let data = await client.get('/stores', { ownerId, submitType: 'findJoin', ref: ['orders', 'users'] });
     let data = await client.get('/stores');
     data = _.filter(data, function (item) {
         return item.owner == ownerId
@@ -132,5 +131,33 @@ router.put('/delServices/:id', async function (req, res) {
     });
     await client.put('/stores/' + storeId, {services:ary});
     res.send('suc');
+});
+
+// 获取修改店铺商品
+router.post('/updateGoods',async function(req,res){
+    let {storeId,goodId}=req.body
+    let ary = await client.get('/stores');
+    let tStore=_.filter(ary,function(e){
+        return e._id==storeId
+    });
+    let tGood=_.filter(tStore[0].goods,function(e){
+        return e._id=goodId
+    })
+    res.send(tGood[0]);
+});
+
+// 确认修改店铺商品
+router.put('/updateGoods/:id',async function(req,res){
+    let body=req.body;
+    let id=req.params.id;
+    let obj = await client.get('/stores/'+id);
+    obj.goods.forEach(element => {
+        if(element._id==body.goodId){
+            element.price=body.price;
+            element.amount=body.amount;
+        }
+    });
+    await client.put('/stores/'+id,{goods:obj.goods})
+    res.send('suc')
 });
 module.exports = router;
