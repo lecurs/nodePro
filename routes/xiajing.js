@@ -59,7 +59,6 @@ router.get('/usersAccount', async function (req, res) {
             privilege,
             user,
             passed,
-            // findType: "exact"
         });
         res.send(data);
     } else {
@@ -240,4 +239,58 @@ router.get('/getAllSupplier', async function (req, res) {
     });
     res.send(data);
 });
+
+//获取所有店铺
+
+router.get('/getAllStores', async function (req, res) {
+    let params = req.query;
+    let page = params.page || 1;
+    let rows = params.rows || 5;
+    let name =params.name
+    let data = await client.get("/stores", {
+        page,
+        rows,
+        name
+    });
+    res.send(data);
+});
+
+//更改店铺状态
+
+
+router.put('/updateStore/:id', async function (req, res) { //更改用户账户状态
+
+    let id = req.params.id;
+    let passed = req.body.passed;
+    console.log('====================================');
+    console.log(id, passed);
+    console.log('====================================');
+    await client.put("/stores/" + id, {
+        "passed": passed,
+    });
+    res.send("suc");
+});
+router.get('/getAllStoresByType', async function (req, res) {
+    let params = req.query;
+    let page = params.page || 1;
+    let rows = params.rows || 5;
+    let passed = params.passed;
+    if (passed) {
+        let data = await client.get("/stores", {
+            page,
+            rows,
+            passed,
+            findType: "exact"
+        });
+        res.send(data);
+    } else {
+        let data = await client.get("/stores", {
+            page,
+            rows,
+        });
+        res.send(data);
+    }
+
+});
+
 module.exports = router;
