@@ -70,10 +70,10 @@ router.put('/addGoods/:id', async function (req, res) {
     });
     if (haveGood.length == 0) {
         let obj = {
+            _id:dataGood._id,
             name: dataGood.name,
             type: dataGood.type,
             weight: dataGood.weight,
-            area: dataGood.area,
             productDate: dataGood.productDate,
             longLife: dataGood.longLife,
             price: dataGood.price,
@@ -82,6 +82,18 @@ router.put('/addGoods/:id', async function (req, res) {
         dataStore.goods.push(obj);
         await client.put('/stores/' + storeId, {goods:dataStore.goods});
     }
+    res.send('suc');
+});
+
+// 下架门店商品
+router.put('/delGoods/:id', async function (req, res) {
+    let storeId = req.params.id;
+    let { id } = req.body;
+    let obj = await client.get('/stores/' + storeId);
+    let ary=_.filter(obj.goods,function(e){
+        return e._id!=id
+    });
+    await client.put('/stores/' + storeId, {goods:ary});
     res.send('suc');
 });
 
@@ -96,6 +108,7 @@ router.put('/addServices/:id', async function (req, res) {
     });
     if (haveService.length == 0) {
         let obj = {
+            _id:dataService._id,
             name: dataService.name,
             workTime: dataService.workTime,
             timeLong: dataService.timeLong,
@@ -106,6 +119,18 @@ router.put('/addServices/:id', async function (req, res) {
         dataStore.services.push(obj);
         await client.put('/stores/' + storeId, {services:dataStore.services});
     }
+    res.send('suc');
+});
+
+// 下线门店服务
+router.put('/delServices/:id', async function (req, res) {
+    let storeId = req.params.id;
+    let { id } = req.body;
+    let obj = await client.get('/stores/' + storeId);
+    let ary=_.filter(obj.services,function(e){
+        return e._id!=id
+    });
+    await client.put('/stores/' + storeId, {services:ary});
     res.send('suc');
 });
 module.exports = router;
