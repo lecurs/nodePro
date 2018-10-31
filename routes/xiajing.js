@@ -246,7 +246,7 @@ router.get('/getAllStores', async function (req, res) {
     let params = req.query;
     let page = params.page || 1;
     let rows = params.rows || 5;
-    let name =params.name
+    let name = params.name
     let data = await client.get("/stores", {
         page,
         rows,
@@ -291,6 +291,15 @@ router.get('/getAllStoresByType', async function (req, res) {
         res.send(data);
     }
 
+});
+
+// ============获取用户session===========
+router.get('/getSession', function (req, res, next) {
+    res.send(req.session.user || {});
+});
+router.post('/removeSession', function (req, res, next) {
+    req.session.user = {};
+    res.send("suc");
 });
 
 module.exports = router;

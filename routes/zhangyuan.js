@@ -52,12 +52,13 @@ router.post('/reg', async function (req, res) {//post提交就在body里面获�
 router.post('/login', async function (req, res) {
   let body = req.body;
   let data = await client.get("/users", body);//get 获取数据库信息匹配
-  // console.log(data)
-  // console.log(data[0].privilege)
+
   if(Object.keys(data).length>0) {
     if(data[0].privilege==1){
+      req.session.user = data[0];
       res.send({ status: 1 });//平台管理登录
     }else if(data[0].passed==1){
+      req.session.user = {phone:'11111111111111',pwd:'66666'};
       res.send({ status: 0 });//店铺管理登录
     }else{
       res.send({ status: 2 });//待审核
