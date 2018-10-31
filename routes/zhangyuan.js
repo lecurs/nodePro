@@ -58,7 +58,7 @@ router.post('/login', async function (req, res) {
       req.session.user = data[0];
       res.send({ status: 1 });//平台管理登录
     }else if(data[0].passed==1){
-      req.session.user = {phone:'11111111111111',pwd:'66666'};
+      req.session.user = data[0];
       res.send({ status: 0 });//店铺管理登录
     }else{
       res.send({ status: 2 });//待审核

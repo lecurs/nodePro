@@ -14,6 +14,16 @@ router.get('/', async function (req, res) {
     res.send(data);
 });
 
+// 获取店主
+router.get('/getOwner', async function (req, res) {
+    let id = req.query.userId ;
+    let data = await client.get('/owners',{ submitType: 'findJoin', ref: 'users' });
+    data = _.filter(data, function (item) {
+        return item.users._id == id
+    })
+    res.send(data[0]._id);
+});
+
 // 获取指定门店
 router.get('/:id', async function (req, res) {
     let id = req.params.id;
