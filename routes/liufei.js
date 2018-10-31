@@ -18,7 +18,9 @@ router.put('/:id', async function (req, res) {
     //     $id:body.users
     // };
     let id=req.params.id;
-    await client.put('/users/'+id,{user:body.user,phone:body.phone,pwd:body.pwd,role:body.role,privilege:body.privilege});
+    if(body.passed=="1"){
+        await client.put('/users/'+id,{user:body.user,phone:body.phone,pwd:body.pwd,role:body.role,privilege:body.privilege});
+    };
     // let data = await client.get('/students/'+id);
     res.send('suc')
 });
