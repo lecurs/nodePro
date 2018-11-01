@@ -51,10 +51,13 @@ router.get('/servicesOfStore/:id', async function (req, res) {
 // 获取店主商品
 router.get('/getMyGoods/:id', async function (req, res) {
     let id = req.params.id;
+    console.log("ownerId",id)
     let data = await client.get('/goods', { submitType: 'findJoin', ref: 'owners' });
     data = _.filter(data, function (item) {
+        console.log("item",item)
         return item.owners._id == id
     });
+    console.log("data",data)
     res.send(data);
 });
 
