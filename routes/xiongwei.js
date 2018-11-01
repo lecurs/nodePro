@@ -9,7 +9,7 @@ router.get('/', async function (req, res) {
     let { ownerId } = req.query;
     let data = await client.get('/stores');
     data = _.filter(data, function (item) {
-        return item.owner == ownerId
+        return item.owner == ownerId&&item.passed=="1"
     })
     res.send(data);
 });
