@@ -170,4 +170,16 @@ router.put('/updateGoods/:id',async function(req,res){
     await client.put('/stores/'+id,{goods:obj.goods})
     res.send('suc')
 });
+
+// 添加商品
+router.post('/goodsAdd',async function(req,res){
+    let body =req.body;
+    body.owners = {
+        $ref: 'owners',
+        $id: body.owners
+    };
+    console.log(body)
+    await client.post('/goods',body)
+    res.send("suc")
+})
 module.exports = router;
