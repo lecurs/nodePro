@@ -183,8 +183,12 @@ router.post('/addOwners', async function (req, res) { //给已通过的用户创
 router.put('/updateStorePassed/:id', async function (req, res) { //更改店铺状态
     let id = req.params.id;
     let passed = req.body.passed;
+    console.log('====================================');
+    console.log(passed);
+    console.log('====================================');
     let newMsg = req.body.newMsg;
     let data = await client.get("/stores/" + id);
+    data.passed=passed;
     if (newMsg) {
         data.name = newMsg.name
         data.licenseCode = newMsg.licenseCode
@@ -210,7 +214,8 @@ router.put('/updateStorePassed/:id', async function (req, res) { //更改店铺�
         "shopImg": data.shopImg,
         "special": data.special,
         "vip": data.vip,
-        "rate": data.rate
+        "rate": data.rate,
+        'passed':data.passed,
     });
 
     res.send(result);
