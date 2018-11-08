@@ -185,4 +185,19 @@ router.post('/goodsAdd',async function(req,res){
     await client.post('/goods',body)
     res.send("suc")
 })
+// 添加服务
+router.post('/servicesAdd',async function(req,res){
+    let body =req.body;
+    body.owners = {
+        $ref:'owners',
+        $id:body.owners
+    };
+    body.stores={
+        $ref:'stores',
+        $id:body.stores
+    }
+    await client.post('/services',body)
+    res.send("suc")
+})
+
 module.exports = router;
