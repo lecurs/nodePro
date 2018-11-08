@@ -9,15 +9,15 @@ router.get('/', async function (req, res) {
     let { ownerId } = req.query;
     let data = await client.get('/stores');
     data = _.filter(data, function (item) {
-        return item.owner == ownerId&&item.passed=="1"
+        return item.owner == ownerId && item.passed == "1"
     })
     res.send(data);
 });
 
 // 获取店主
 router.get('/getOwner', async function (req, res) {
-    let id = req.query.userId ;
-    let data = await client.get('/owners',{ submitType: 'findJoin', ref: 'users' });
+    let id = req.query.userId;
+    let data = await client.get('/owners', { submitType: 'findJoin', ref: 'users' });
     data = _.filter(data, function (item) {
         return item.users._id == id
     })
@@ -51,13 +51,13 @@ router.get('/servicesOfStore/:id', async function (req, res) {
 // 获取店主商品
 router.get('/getMyGoods/:id', async function (req, res) {
     let id = req.params.id;
-    console.log("ownerId",id)
+    console.log("ownerId", id)
     let data = await client.get('/goods', { submitType: 'findJoin', ref: 'owners' });
     data = _.filter(data, function (item) {
-        console.log("item",item)
+        console.log("item", item)
         return item.owners._id == id
     });
-    console.log("data",data)
+    console.log("data", data)
     res.send(data);
 });
 
@@ -82,7 +82,7 @@ router.put('/addGoods/:id', async function (req, res) {
     });
     if (haveGood.length == 0) {
         let obj = {
-            _id:dataGood._id,
+            _id: dataGood._id,
             name: dataGood.name,
             type: dataGood.type,
             weight: dataGood.weight,
@@ -92,7 +92,7 @@ router.put('/addGoods/:id', async function (req, res) {
             amount: dataGood.amount
         }
         dataStore.goods.push(obj);
-        await client.put('/stores/' + storeId, {goods:dataStore.goods});
+        await client.put('/stores/' + storeId, { goods: dataStore.goods });
     }
     res.send('suc');
 });
@@ -102,10 +102,10 @@ router.put('/delGoods/:id', async function (req, res) {
     let storeId = req.params.id;
     let { id } = req.body;
     let obj = await client.get('/stores/' + storeId);
-    let ary=_.filter(obj.goods,function(e){
-        return e._id!=id
+    let ary = _.filter(obj.goods, function (e) {
+        return e._id != id
     });
-    await client.put('/stores/' + storeId, {goods:ary});
+    await client.put('/stores/' + storeId, { goods: ary });
     res.send('suc');
 });
 
@@ -120,7 +120,7 @@ router.put('/addServices/:id', async function (req, res) {
     });
     if (haveService.length == 0) {
         let obj = {
-            _id:dataService._id,
+            _id: dataService._id,
             name: dataService.name,
             workTime: dataService.workTime,
             timeLong: dataService.timeLong,
@@ -129,7 +129,7 @@ router.put('/addServices/:id', async function (req, res) {
             weight: dataService.weight
         }
         dataStore.services.push(obj);
-        await client.put('/stores/' + storeId, {services:dataStore.services});
+        await client.put('/stores/' + storeId, { services: dataStore.services });
     }
     res.send('suc');
 });
@@ -139,50 +139,57 @@ router.put('/delServices/:id', async function (req, res) {
     let storeId = req.params.id;
     let { id } = req.body;
     let obj = await client.get('/stores/' + storeId);
-    let ary=_.filter(obj.services,function(e){
-        return e._id!=id
+    let ary = _.filter(obj.services, function (e) {
+        return e._id != id
     });
-    await client.put('/stores/' + storeId, {services:ary});
+    await client.put('/stores/' + storeId, { services: ary });
     res.send('suc');
 });
 
 // 获取修改店铺商品
-router.post('/updateGoods',async function(req,res){
-    let {storeId,goodId}=req.body
+router.post('/updateGoods', async function (req, res) {
+    let { storeId, goodId } = req.body
     let ary = await client.get('/stores');
-    let tStore=_.filter(ary,function(e){
-        return e._id==storeId
+    let tStore = _.filter(ary, function (e) {
+        return e._id == storeId
     });
-    let tGood=_.filter(tStore[0].goods,function(e){
-        return e._id=goodId
+    let tGood = _.filter(tStore[0].goods, function (e) {
+        return e._id = goodId
     })
     res.send(tGood[0]);
 });
 
 // 确认修改店铺商品
-router.put('/updateGoods/:id',async function(req,res){
-    let body=req.body;
-    let id=req.params.id;
-    let obj = await client.get('/stores/'+id);
+router.put('/updateGoods/:id', async function (req, res) {
+    let body = req.body;
+    let id = req.params.id;
+    let obj = await client.get('/stores/' + id);
     obj.goods.forEach(element => {
-        if(element._id==body.goodId){
-            element.price=body.price;
-            element.amount=body.amount;
+        if (element._id == body.goodId) {
+            element.price = body.price;
+            element.amount = body.amount;
         }
     });
-    await client.put('/stores/'+id,{goods:obj.goods})
+    await client.put('/stores/' + id, { goods: obj.goods })
     res.send('suc')
 });
 
 // 添加商品
-router.post('/goodsAdd',async function(req,res){
-    let body =req.body;
+router.post('/goodsAdd', async function (req, res) {
+    let body = req.body;
     body.owners = {
         $ref: 'owners',
         $id: body.owners
     };
-    console.log(body)
-    await client.post('/goods',body)
+    await client.post('/goods', body)
     res.send("suc")
+})
+
+// 遍历所有商品
+router.get('/allGoods', async function (req, res) {
+    let { page, rows } = req.query;
+    let data = await client.get('/goods', { page, rows ,submitType:'findJoin',ref:"owners"});
+    console.log(data)
+    res.send(data);
 })
 module.exports = router;
