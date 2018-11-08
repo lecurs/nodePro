@@ -184,6 +184,7 @@ router.post('/goodsAdd', async function (req, res) {
     await client.post('/goods', body)
     res.send("suc")
 })
+<<<<<<< HEAD
 
 // 遍历所有商品
 router.get('/allGoods', async function (req, res) {
@@ -192,4 +193,21 @@ router.get('/allGoods', async function (req, res) {
     console.log(data)
     res.send(data);
 })
+=======
+// 添加服务
+router.post('/servicesAdd',async function(req,res){
+    let body =req.body;
+    body.owners = {
+        $ref:'owners',
+        $id:body.owners
+    };
+    body.stores={
+        $ref:'stores',
+        $id:body.stores
+    }
+    await client.post('/services',body)
+    res.send("suc")
+})
+
+>>>>>>> ab224eed732cc17cdcff3500198e7e3dcac7650b
 module.exports = router;
